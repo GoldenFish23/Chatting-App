@@ -8,16 +8,20 @@ global Login
 @app.route('/homepage')
 def homepage():
     Login = session.get('login', False)
+    if Login != False:
+        return render_template('homepage.html', Login=Login)
     return render_template('base.html',Login=Login)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     Login = session.get('login', False)
+    file_path = os.path.join('json', 'user.json')
     if Login == False:
         if request.method == "POST":
             username = request.form.get('username')
             password = request.form.get('password')
-            login = request.form.get('login')
+            login = request.form.get('login',False)
+
             if not username or not password:
                 if not username:
                     return render_template('login.html', Login=Login, error='Username is required')
@@ -25,13 +29,34 @@ def login():
                     return render_template('login.html', Login=Login, error='Password is required')
             else:
                 data = {'username': username, 'password': password}
-                print('Recieved: ' + data['username'] + ' ' + data['password'])
-                file_path = os.path.join('json', 'user.json')
-                with open(file_path, 'w') as data_file:
-                    json.dump(data, data_file)
-
+                print('Recieved123: ' + data['username'] + ' ' + data['password'])
+                try:
+                    with open(file_path, 'r') as data_file:
+                        content = json.load(data_file)
+                        if data['username'] == content['valid_users']['username'] and data['password'] == content['valid_users']['password'] and login == False:
+                            session['login'] = True
+                            Login = session['login']
+                            return render_template('homepage.html', username = username, Login = Login)
+                except json.JSONDecodeError:
+                    print("No user really exists.")
+                    return render_template('login.html', Login=Login, error='No user found')
+                except Exception as e:
+                    print("Error: " + str(e))
         return render_template('login.html', Login=Login)
-    return render_template('homepage.html')
+    try:
+        with open(file_path, 'r') as data_file:
+            content = json.load(data_file)
+            if content['valid_users']['username'] and content['valid_users']['password']:
+                username = content['valid_users']['username']
+                session['login'] = True
+                Login = session['login']
+                return render_template('homepage.html', username = username, Login = Login)
+    except json.JSONDecodeError:
+        session['login'] = False
+        Login = session['login']
+        print("probably some mistake")
+        return "probably some mistake"
+    return render_template('homepage.html', username=username, Login=Login)
 
 @app.route('/signup', methods = ['GET', 'POST'])
 def signup():
@@ -58,7 +83,7 @@ def signup():
                 Login = session['login']
                 return render_template('homepage.html', username = username, Login = Login)
         return render_template('signup.html', Login=Login)
-    return render_template('homepage.html')
+    return render_template('homepage.html', Login=Login)
 
 @app.route('/logout')
 def logout():

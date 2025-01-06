@@ -2,17 +2,26 @@ body{
     background-color: skyblue;
     font-family: Arial, sans-serif;
     margin:0px;
+    height:100vh;
 }
 
 nav{
+    height : 10vh;
+    flex-shrink: 0;
     padding: 5px 0px;
+    padding-bottom: 0px;
     display: flex;
     align-items: baseline;
     justify-content: space-between;
 }
+nav .navigation-left, .navigation-right{
+    display:flex;
+    align-items: center;
+    height: 100%;
+}
+
 nav .navigation-left h1{
     left:0px;
-    margin-top: 15px;
     padding:0px 15px;
 }
 
@@ -38,4 +47,66 @@ body hr{
     padding: 4px 0px;
     background-color: black;
     border-width: 0px;
+}
+
+body .main{
+    flex-grow: 1;
+    height:89vh;
+    width: 100%;
+}
+
+body .main .popcase{
+    width:100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+body .main .popcase form{
+    display:inline-flex;
+    flex-direction: column;
+    padding: 30px;
+    background-color: azure;
+}
+
+body .main .popcase form label, input{
+    margin:3px;
+}
+
+body .main .popcase form button{
+    margin: 5px 3px;
+    padding:5px;
+}
+
+body .main .main-div{
+    height: 100%;
+}
+
+body .main .main-div{
+    height: 100%;
+    flex-grow: 1;
+    display: flex;
+}
+
+body .main .main-div .side-nav{
+    background-color: darkslategray;
+    width: 10%;
+    flex-grow: 0;
+}
+
+body .main .main-div .side-nav ul{
+    margin:0px;
+    padding: 0px;
+}
+
+body .main .main-div .side-nav ul li{
+    list-style: none;
+    padding: 10px 0px;
+    text-align: center;
+} 
+
+body .main .main-div .side-content{
+    flex-grow: 1;
+    width: 90%;
 }

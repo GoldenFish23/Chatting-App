@@ -1,6 +1,19 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <p>Hello {{username}},</p><br>
-    <p>You have no active chats.</p>
+    {% if Login == True %}
+        <div class = "main-div">
+            <div class = "side-nav">
+                <ul>
+                    <li><a href="{{ url_for('static', filename ='images/plus.png') }}"><img src = "static/images/plus.png"></a></li>
+                    <li>Im1</li>
+                    <li>Im1</li>
+                </ul>
+            </div>
+            <div class = "side-content">
+                <p>Hello {{username}},</p><br>
+                <p>You have no active chats.</p>
+            </div>
+        </div>
+    {% endif %}
 {% endblock %}
