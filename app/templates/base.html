@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
+    </head>
+    <body>
+        <nav>
+            <div class = "navigation-left">
+                <h1>hello</h1>
+            </div>
+            <div class = "navigation-right">
+                {% if Login == False %}
+                    <ul>
+                        <li><button><a href ="{{url_for('login')}}">Login</a></button></li>
+                        <li><button><a href ="{{url_for('signup')}}">SignUp</a></button></li>
+                    </ul>
+                {% endif %}
+                {% if Login == True %}
+                    <ul>
+                        <li><button><a href = "{{url_for('logout')}}">Logout</a></button></li>
+                    </ul>
+                {% endif %}
+            </div>
+        </nav>
+        <hr>
+        
+        <div class = "main">
+            {% block content %}
+            {% endblock %}
+        </div>
+    </body>
+</html>

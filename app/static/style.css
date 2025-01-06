@@ -1,0 +1,41 @@
+body{
+    background-color: skyblue;
+    font-family: Arial, sans-serif;
+    margin:0px;
+}
+
+nav{
+    padding: 5px 0px;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+}
+nav .navigation-left h1{
+    left:0px;
+    margin-top: 15px;
+    padding:0px 15px;
+}
+
+nav .navigation-right ul{
+    display: flex;
+    right: -20px;
+    justify-items: space-evenly;
+    margin: 0px;
+}
+
+nav .navigation-right ul li{
+    padding:5px 10px;
+    list-style: none;
+}
+
+nav .navigation-right ul li button{
+    padding:8px 15px;
+    border-radius: 25px;
+}
+
+body hr{
+    margin: 0px;
+    padding: 4px 0px;
+    background-color: black;
+    border-width: 0px;
+}
