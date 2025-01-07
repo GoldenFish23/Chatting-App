@@ -1,5 +1,5 @@
 from app import app, socketio
-from flask import Flask, render_template, redirect, session, url_for, request
+from flask import Flask, render_template, redirect, session, url_for, request, logging
 from flask_socketio import SocketIO, send, emit
 import json, os
 
@@ -54,13 +54,14 @@ def login():
     except json.JSONDecodeError:
         session['login'] = False
         Login = session['login']
-        print("probably some mistake")
-        return "probably some mistake"
+        print("probably some mistake in logging in...") 
+        return "probably some mistake in logging in..."
     return render_template('homepage.html', username=username, Login=Login)
 
 @app.route('/signup', methods = ['GET', 'POST'])
 def signup():
     Login = session.get('login',False)
+    file_path = os.path.join('json', 'user.json')
     if Login == False:
         if request.method == "POST":
             username = request.form.get('username')
@@ -83,7 +84,20 @@ def signup():
                 Login = session['login']
                 return render_template('homepage.html', username = username, Login = Login)
         return render_template('signup.html', Login=Login)
-    return render_template('homepage.html', Login=Login)
+    try:
+        with open(file_path, 'r') as data_file:
+            content = json.load(data_file)
+            if content['valid_users']['username'] and content['valid_users']['password']:
+                username = content['valid_users']['username']
+                session['login'] = True
+                Login = session['login']
+                return render_template('homepage.html', username = username, Login = Login)
+    except json.JSONDecodeError:
+        session['login'] = False
+        Login = session['login']
+        print("probably some mistake")
+        return "probably some mistake"
+    return render_template('homepage.html',username=username, Login=Login)
 
 @app.route('/logout')
 def logout():

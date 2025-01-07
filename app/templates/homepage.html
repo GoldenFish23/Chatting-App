@@ -2,12 +2,29 @@
 
 {% block content %}
     {% if Login == True %}
+        <script>
+            var socket = io.connect('http://127.0.0.1:5000');
+            socket.on('connect', () => {
+                console.log('Connected');
+                socket.emit('my event', {data: 'I\'m connected!'});
+            });
+
+            socket.on('message', (data) => {
+                console.log(data);
+            });
+
+            socket.emit('message', 'Hello from the client!');
+
+            socket.on('disconnect', () => {
+                console.log('Disconnected');
+            });
+        </script>
         <div class = "main-div">
             <div class = "side-nav">
                 <ul>
                     <li><a href="{{ url_for('static', filename ='images/plus.png') }}"><img src = "static/images/plus.png"></a></li>
-                    <li>Im1</li>
-                    <li>Im1</li>
+                    <li><a href="{{ url_for('static', filename ='images/link.png') }}"><img src = "static/images/link.png"></a></li>
+                    <li><a href="{{ url_for('static', filename ='images/setting.png') }}"><img src = "static/images/setting.png"></a></li>
                 </ul>
             </div>
             <div class = "side-content">
