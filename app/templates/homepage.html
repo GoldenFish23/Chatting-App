@@ -22,14 +22,32 @@
         <div class = "main-div">
             <div class = "side-nav">
                 <ul>
-                    <li><a href="{{ url_for('static', filename ='images/plus.png') }}"><img src = "static/images/plus.png"></a></li>
-                    <li><a href="{{ url_for('static', filename ='images/link.png') }}"><img src = "static/images/link.png"></a></li>
-                    <li><a href="{{ url_for('static', filename ='images/setting.png') }}"><img src = "static/images/setting.png"></a></li>
+                    <li><a href="{{ url_for('user_host_room', username = username) }}"><button><img src = "{{ url_for('static', filename = 'images/comment.png') }}"></button></a></li>
+                    <li><a href="{{ url_for('user_host_room', username = username) }}"><button><img src = "{{ url_for('static', filename = 'images/plus.png') }}"></button></a></li>
+                    <li><a href="{{ url_for('user_host_room', username = username) }}"><button><img src = "{{ url_for('static', filename = 'images/link.png') }}"></button></a></li>
+                    <li><a href="{{ url_for('user_host_room', username = username) }}"><button><img src = "{{ url_for('static', filename = 'images/setting.png') }}"></button></a></li>
                 </ul>
             </div>
             <div class = "side-content">
-                <p>Hello {{username}},</p><br>
-                <p>You have no active chats.</p>
+                <div class = "some-padding">
+                    <h1>Welcome to the Chatting App</h1>
+                    {% if selected == 'hostroom' %}
+                        <h2>Host Room</h2>
+                        <form method = "post">
+                            <label>Room Name:</label>
+                            <input type = "text" name = "roomname" placeholder = "roomname" value="{{roomname}}">
+                            <button type = "submit" name = "hostroom" value = "hostroom">Create Room</button>
+                        </form>
+                    {% endif %}
+                    {% if selected == 'joinroom' %}
+                        <h2>Join Room</h2>
+                        <form method = "post">
+                            <label>Room Name:</label>
+                            <input type = "text" name = "roomname" placeholder = "roomname" value="{{roomname}}">
+                            <button type = "submit" name = "joinroom" value = "joinroom">Join Room</button>
+                        </form>
+                    {% endif %}
+                </div>
             </div>
         </div>
     {% endif %}

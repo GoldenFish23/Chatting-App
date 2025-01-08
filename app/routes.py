@@ -105,6 +105,17 @@ def logout():
     Login = session.get('login', False)
     return render_template('base.html', Login=Login)
 
+@app.route('/user/<username>', methods=['GET', 'POST'])
+def user_host_room(username):
+    Login = session.get('login', False)
+    if Login != False:
+        if request.method == 'POST':
+            if request.POST.get('button_val') == 'hostroom':
+                return render_template('homepage.html', Login=Login, selected = 'hostroom', username = username)
+        return render_template('homepage.html', Login=Login, selected = 'hostroom', username = username)
+    print('faced some error...')
+    return render_template('base.html',Login=Login)
+
 @socketio.on('connect')
 def test_connect():
     print('Client connected')
