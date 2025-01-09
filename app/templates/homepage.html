@@ -22,21 +22,26 @@
         <div class = "main-div">
             <div class = "side-nav">
                 <ul>
-                    <li><a href="{{ url_for('user_host_room', username = username) }}"><button><img src = "{{ url_for('static', filename = 'images/comment.png') }}"></button></a></li>
-                    <li><a href="{{ url_for('user_host_room', username = username) }}"><button><img src = "{{ url_for('static', filename = 'images/plus.png') }}"></button></a></li>
-                    <li><a href="{{ url_for('user_host_room', username = username) }}"><button><img src = "{{ url_for('static', filename = 'images/link.png') }}"></button></a></li>
-                    <li><a href="{{ url_for('user_host_room', username = username) }}"><button><img src = "{{ url_for('static', filename = 'images/setting.png') }}"></button></a></li>
+                    <li><form method = "post" action="{{ url_for('user_host_room', username = username) }}"><button type ="submit" name = "button_val" value = "chats"><img src = "{{ url_for('static', filename = 'images/comment.png') }}"></button></form></li>
+                    <li><form method = "post" action="{{ url_for('user_host_room', username = username) }}"><button type ="submit" name = "button_val" value = "hostroom"><img src = "{{ url_for('static', filename = 'images/plus.png') }}"></button></form></li>
+                    <li><form method = "post" action="{{ url_for('user_host_room', username = username) }}"><button type = "submit" name = "button_val" value = "joinroom"><img src = "{{ url_for('static', filename = 'images/link.png') }}"></button></form></li>
+                    <li><form method = "post" action="{{ url_for('user_host_room', username = username) }}"><button type ="submit" name = "button_val" value = "settings"><img src = "{{ url_for('static', filename = 'images/setting.png') }}"></button></form></li>
                 </ul>
             </div>
             <div class = "side-content">
                 <div class = "some-padding">
                     <h1>Welcome to the Chatting App</h1>
+                    {% if selected == 'chats' or selected == None %}
+                        <div>
+                            <p>some chats will arrive here.</p>
+                        </div>
+                    {% endif %}
                     {% if selected == 'hostroom' %}
                         <h2>Host Room</h2>
                         <form method = "post">
                             <label>Room Name:</label>
                             <input type = "text" name = "roomname" placeholder = "roomname" value="{{roomname}}">
-                            <button type = "submit" name = "hostroom" value = "hostroom">Create Room</button>
+                            <button type = "submit" name = "hostroomy" value = "hostroom">Create Room</button>
                         </form>
                     {% endif %}
                     {% if selected == 'joinroom' %}
@@ -44,8 +49,11 @@
                         <form method = "post">
                             <label>Room Name:</label>
                             <input type = "text" name = "roomname" placeholder = "roomname" value="{{roomname}}">
-                            <button type = "submit" name = "joinroom" value = "joinroom">Join Room</button>
+                            <button type = "submit" name = "joinroomy" value = "joinroom">Join Room</button>
                         </form>
+                    {% endif %}
+                    {% if selected == 'settings' %}
+                        <p>No settings here</p>
                     {% endif %}
                 </div>
             </div>

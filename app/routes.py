@@ -1,6 +1,6 @@
 from app import app, socketio
 from flask import Flask, render_template, redirect, session, url_for, request, logging
-from flask_socketio import SocketIO, send, emit
+from flask_socketio import SocketIO, send, emit, join_room, leave_room
 import json, os
 
 global Login
@@ -106,13 +106,22 @@ def logout():
     return render_template('base.html', Login=Login)
 
 @app.route('/user/<username>', methods=['GET', 'POST'])
-def user_host_room(username):
+def user_host_room(username, selected=None):
     Login = session.get('login', False)
-    if Login != False:
+    if Login != False: #Bug here not secure
         if request.method == 'POST':
-            if request.POST.get('button_val') == 'hostroom':
+            
+            if request.form.get('button_val') == 'hostroom':
                 return render_template('homepage.html', Login=Login, selected = 'hostroom', username = username)
-        return render_template('homepage.html', Login=Login, selected = 'hostroom', username = username)
+            elif request.form.get('button_val') == 'joinroom':
+                return render_template('homepage.html', Login=Login, selected = 'joinroom', username = username)
+            elif request.form.get('button_val') == 'settings':
+                return render_template('homepage.html', Login=Login, selected = 'settings', username = username)
+            elif request.form.get('button_val') == 'chats' or selected == None:
+                return render_template('homepage.html', Login=Login, selected = 'chats', username = username)
+            
+        print('this not is a joinroom')
+        return render_template('homepage.html', Login=Login, selected = 'joinroom', username = username)
     print('faced some error...')
     return render_template('base.html',Login=Login)
 
@@ -128,3 +137,17 @@ def test_connect():
 def handle_message(message):
     print('received message: ' + message)
     send(message, broadcast=True)
+
+@socketio.on('join')
+def on_join(data):
+    username = data['username']
+    room = data['room']
+    join_room(room)
+    emit('message', username + ' has entered the room.', room=room)
+
+@socketio.on('leave')
+def on_leave(data):
+    username = data['username']
+    room = data['room']
+    leave_room(room)
+    emit('message', username + ' has left the room.', room=room)

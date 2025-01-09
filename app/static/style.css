@@ -115,7 +115,7 @@ body .main .main-div .side-nav ul li{
     text-align: center;
 } 
 
-body .main .main-div .side-nav ul li a img{
+body .main .main-div .side-nav ul li form img{
     width: 50px;
     height: 50px;
     padding: 10px;
@@ -124,4 +124,7 @@ body .main .main-div .side-nav ul li a img{
 body .main .main-div .side-content{
     flex-grow: 1;
     width: 90%;
+}
+body .main .main-div .side-content .some-padding{
+    padding: 20px;
 }
