@@ -36,7 +36,7 @@ def login():
                         if data['username'] == content['valid_users']['username'] and data['password'] == content['valid_users']['password'] and login == False:
                             session['login'] = True
                             Login = session['login']
-                            return render_template('homepage.html', username = username, Login = Login)
+                            return redirect(url_for('user_host_room', username = username, selected = 'chats', roomname = ""))
                 except json.JSONDecodeError:
                     print("No user really exists.")
                     return render_template('login.html', Login=Login, error='No user found')
@@ -106,23 +106,33 @@ def logout():
     return render_template('base.html', Login=Login)
 
 @app.route('/user/<username>', methods=['GET', 'POST'])
-def user_host_room(username, selected=None):
+def user_host_room(username, selected=None, roomcode=None): #roomcode is a problem
     Login = session.get('login', False)
     if Login != False: #Bug here not secure
         if request.method == 'POST':
-            
             if request.form.get('button_val') == 'hostroom':
-                return render_template('homepage.html', Login=Login, selected = 'hostroom', username = username)
+                return render_template('homepage.html', Login=Login, selected = 'hostroom', username = username, roomcode="")
             elif request.form.get('button_val') == 'joinroom':
-                return render_template('homepage.html', Login=Login, selected = 'joinroom', username = username)
+                return render_template('homepage.html', Login=Login, selected = 'joinroom', username = username,roomcode="")
             elif request.form.get('button_val') == 'settings':
                 return render_template('homepage.html', Login=Login, selected = 'settings', username = username)
             elif request.form.get('button_val') == 'chats' or selected == None:
                 return render_template('homepage.html', Login=Login, selected = 'chats', username = username)
+            elif request.form.get('but_room') == 'hostroomy' and roomcode != "":
+                    return redirect(url_for('user_join_room', username=username, selected = 'hostroom', roomcode=roomcode))
+            elif request.form.get('but_room') == 'joinroomy' and roomcode != "":
+                    return redirect(url_for('user_join_room', username=username, selected = 'joinroom', roomcode=roomcode))
             
         print('this not is a joinroom')
-        return render_template('homepage.html', Login=Login, selected = 'joinroom', username = username)
+        return render_template('homepage.html', Login=Login, selected = 'chats', username = username)
     print('faced some error...')
+    return render_template('base.html',Login=Login)
+
+@app.route('/user/<username>/<roomcode>', methods=['GET', 'POST'])
+def user_join_room(username,selected, roomcode):
+    Login = session.get('login', False)
+    if Login != False:
+        return render_template('homepage.html', Login=Login, selected = selected, username = username, roomcode = roomcode)
     return render_template('base.html',Login=Login)
 
 @socketio.on('connect')

@@ -18,6 +18,15 @@
             socket.on('disconnect', () => {
                 console.log('Disconnected');
             });
+
+            socket.on('join', () => {
+                console.log('Joined the room');
+            });
+
+            socket.on('leave', () => {
+                console.log('Left the room');
+            });
+
         </script>
         <div class = "main-div">
             <div class = "side-nav">
@@ -40,16 +49,21 @@
                         <h2>Host Room</h2>
                         <form method = "post">
                             <label>Room Name:</label>
-                            <input type = "text" name = "roomname" placeholder = "roomname" value="{{roomname}}">
-                            <button type = "submit" name = "hostroomy" value = "hostroom">Create Room</button>
+                            <input type = "text" name = "roomcode" placeholder = "roomname" value="{{roomcode}}">
+                            <button type = "submit" name = "but_room" value = "hostroomy">Create Room</button>
                         </form>
+                        {% if roomcode != "" %}
+                            <div class = "rooms-here">
+                                <p>heres a room for you</p>
+                            </div>
+                        {% endif %}
                     {% endif %}
                     {% if selected == 'joinroom' %}
                         <h2>Join Room</h2>
                         <form method = "post">
                             <label>Room Name:</label>
-                            <input type = "text" name = "roomname" placeholder = "roomname" value="{{roomname}}">
-                            <button type = "submit" name = "joinroomy" value = "joinroom">Join Room</button>
+                            <input type = "text" name = "roomcode" placeholder = "roomname" value="{{roomcode}}">
+                            <button type = "submit" name = "but_room" value = "joinroomy">Join Room</button>
                         </form>
                     {% endif %}
                     {% if selected == 'settings' %}
