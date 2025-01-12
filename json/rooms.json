@@ -1,0 +1,11 @@
+{
+    "rooms": [
+        {
+            "host": "vishnu",
+            "roomcode": "karma",
+            "client": [
+                "ajanta"
+            ]
+        }
+    ]
+}

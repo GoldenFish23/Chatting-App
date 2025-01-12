@@ -1,1 +1,14 @@
-{"valid_users": {"username": "vishnu", "email": "vishnu@gmail.com", "password": "vishnu123"}}
+{
+    "valid_users": [
+        {
+            "username": "ajanta",
+            "email": "ajanta@mail.com",
+            "password": "ajanta"
+        },
+        {
+            "username": "vishnu",
+            "email": "vishnu@gmail.com",
+            "password": "vishnu123"
+        }
+    ]
+}

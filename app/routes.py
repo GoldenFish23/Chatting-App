@@ -33,10 +33,15 @@ def login():
                 try:
                     with open(file_path, 'r') as data_file:
                         content = json.load(data_file)
-                        if data['username'] == content['valid_users']['username'] and data['password'] == content['valid_users']['password'] and login == False:
+                        user_exists = False
+                        for user in content['valid_users']:
+                            if data['username'] == user['username'] and data['password'] == user['password'] and login == False:
+                                user_exists = True
+                                break
+                        if user_exists:
                             session['login'] = True
                             Login = session['login']
-                            return redirect(url_for('user_host_room', username = username, selected = 'chats', roomname = ""))
+                            return redirect(url_for('user_host_room', username = username, selected = 'chats'))
                 except json.JSONDecodeError:
                     print("No user really exists.")
                     return render_template('login.html', Login=Login, error='No user found')
@@ -75,17 +80,32 @@ def signup():
                 if not password:
                     return render_template('signup.html', Login=Login, error='Password is required')
             else:
-                data = {"valid_users":{'username': username, 'email': email, 'password': password}}
-                print('Recieved: ' + data['valid_users']['username'] + ' ' + data['valid_users']['email'] + ' ' + data['valid_users']['password'])
-                file_path = os.path.join('json', 'user.json')
-                with open(file_path, 'w') as data_file:
-                    json.dump(data, data_file)
-                session['login'] = True
-                Login = session['login']
-                return render_template('homepage.html', username = username, Login = Login)
+                data = {"valid_users":[{'username': username, 'email': email, 'password': password}]}
+                print('Recieved: ' + data['valid_users'][0]['username'] + ' ' + data['valid_users'][0]['email'] + ' ' + data['valid_users'][0]['password'])    
+                with open(file_path, 'r+') as data_file:
+                    try:
+                        file_data = json.load(data_file)
+                        user_exists = False
+                        print(file_data)
+                        for users in file_data['valid_users']:
+                            if users['username'] == data['valid_users'][0]['username']:
+                                user_exists = True
+                                break
+                        if not user_exists:
+                            file_data['valid_users'].append({'username': username, 'email': email, 'password': password})
+                            print('Changing somme data')
+                            print(file_data)
+                            data_file.seek(0)
+                            json.dump(file_data, data_file, indent=4)
+                    except json.JSONDecodeError:
+                        json.dump(data, data_file)
+                        print('dumped some')
+                    session['login'] = True
+                    Login = session['login']
+                return redirect(url_for('user_host_room', username = username, selected = 'chats'))
         return render_template('signup.html', Login=Login)
     try:
-        with open(file_path, 'r') as data_file:
+        with open(file_path, 'r+') as data_file:
             content = json.load(data_file)
             if content['valid_users']['username'] and content['valid_users']['password']:
                 username = content['valid_users']['username']
@@ -106,29 +126,64 @@ def logout():
     return render_template('base.html', Login=Login)
 
 @app.route('/user/<username>', methods=['GET', 'POST'])
-def user_host_room(username, selected=None, roomcode=None): #roomcode is a problem
+def user_host_room(username): #roomcode is a problem
     Login = session.get('login', False)
-    if Login != False: #Bug here not secure
+    selected = 'chats'
+    rooms_file_path = os.path.join('json', 'rooms.json')
+    roomcode = ""
+    if Login:
         if request.method == 'POST':
-            if request.form.get('button_val') == 'hostroom':
-                return render_template('homepage.html', Login=Login, selected = 'hostroom', username = username, roomcode="")
-            elif request.form.get('button_val') == 'joinroom':
-                return render_template('homepage.html', Login=Login, selected = 'joinroom', username = username,roomcode="")
-            elif request.form.get('button_val') == 'settings':
-                return render_template('homepage.html', Login=Login, selected = 'settings', username = username)
-            elif request.form.get('button_val') == 'chats' or selected == None:
-                return render_template('homepage.html', Login=Login, selected = 'chats', username = username)
-            elif request.form.get('but_room') == 'hostroomy' and roomcode != "":
-                    return redirect(url_for('user_join_room', username=username, selected = 'hostroom', roomcode=roomcode))
-            elif request.form.get('but_room') == 'joinroomy' and roomcode != "":
-                    return redirect(url_for('user_join_room', username=username, selected = 'joinroom', roomcode=roomcode))
-            
-        print('this not is a joinroom')
-        return render_template('homepage.html', Login=Login, selected = 'chats', username = username)
-    print('faced some error...')
-    return render_template('base.html',Login=Login)
+            selected = request.form.get('button_val', selected)
+            if selected == "hostroom":
+                roomcode = request.form.get('roomcode', "").strip()
+                if request.form.get('but_room') == 'hostroomy' and roomcode != "":
+                    room_data = {"rooms":[{"host": username, "roomcode": roomcode, "client":[]}]}
+                    with open(rooms_file_path, 'r+') as room_file:
+                        try:
+                            rooms_file_content = json.load(room_file)
+                            room_exists = False
+                            for room in rooms_file_content['rooms']:
+                                if room['roomcode'] == room_data['rooms'][0]['roomcode']:
+                                    room_exists = True
+                                    break
+                            if not room_exists:
+                                rooms_file_content["rooms"].append(room_data["rooms"])
+                                print(rooms_file_content)
+                                room_file.seek(0)
+                                json.dump(rooms_file_content, room_file, indent=4)
+                            else:
+                                print('Room already exists')
+                        except json.JSONDecodeError:
+                            json.dump(room_data, room_file, indent=4)
+                            print("somethings missing here")
+                    return redirect(url_for('user_join_room', username=username, selected='hostroom', roomcode=roomcode))
+            elif selected == "joinroom":
+                roomcode = request.form.get('roomcode', "").strip()
+                if request.form.get('but_room') == 'joinroomy' and roomcode != "":
+                    room_data = {"rooms":[{"host": username, "roomcode": roomcode, "client":[]}]}
+                    with open(rooms_file_path,'r+') as room_file:
+                        try:
+                            rooms_file_content = json.load(room_file)
+                            room_exists = False
+                            for room in rooms_file_content['rooms']:
+                                if room['roomcode'] == room_data['rooms'][0]['roomcode']:
+                                    room_exists = True
+                                    break
+                            if room_exists and room_data['rooms'][0]['host'] not in room['client']:
+                                room['client'].append(username)
+                                print(rooms_file_content)
+                                room_file.seek(0)
+                                json.dump(rooms_file_content, room_file, indent=4)
+                            else:
+                                print('Alreaty a member')
+                        except json.JSONDecodeError:
+                            print("no rooms are created yet")
+                    return redirect(url_for('user_join_room', selected='joinroom', username=username, roomcode=roomcode))
+            return render_template('homepage.html', Login=Login, selected=selected, username=username, roomcode=roomcode)
+        return render_template('homepage.html', Login=Login, selected=selected, username=username, roomcode=roomcode)
+    return render_template('base.html', Login=Login)
 
-@app.route('/user/<username>/<roomcode>', methods=['GET', 'POST'])
+@app.route('/user/<username>/<selected>/<roomcode>', methods=['GET', 'POST'])
 def user_join_room(username,selected, roomcode):
     Login = session.get('login', False)
     if Login != False:
@@ -143,21 +198,29 @@ def test_connect():
 def test_connect():
     print('Client disconnected')
 
-@socketio.on('message')
-def handle_message(message):
-    print('received message: ' + message)
-    send(message, broadcast=True)
-
 @socketio.on('join')
 def on_join(data):
     username = data['username']
-    room = data['room']
-    join_room(room)
-    emit('message', username + ' has entered the room.', room=room)
+    roomcode = data['roomcode']
+    if roomcode != "":
+        join_room(roomcode)
+        print(f'{username} joined {roomcode}')
+        send(f'{username} has joined the room', broadcast=True, to=roomcode)
 
 @socketio.on('leave')
 def on_leave(data):
     username = data['username']
-    room = data['room']
-    leave_room(room)
-    emit('message', username + ' has left the room.', room=room)
+    roomcode = data['roomcode']
+    if roomcode != "":
+        leave_room(roomcode)
+        send(f"{username} has left the room!", to=roomcode)
+
+@socketio.on('message')
+def handle_message(data):
+    print(f"Received data: {data}")
+    roomcode = data.get('roomcode')
+    username = data.get('username')
+    message = data.get('message')
+    fullmsg = f'{username} : {message}'
+    print('received message: ' + message)
+    send(fullmsg, broadcast = True, to=roomcode)

@@ -126,5 +126,20 @@ body .main .main-div .side-content{
     width: 90%;
 }
 body .main .main-div .side-content .some-padding{
-    padding: 20px;
+    padding: 0px 20px;
+    height: 100%;
+}
+
+body .main .main-div .side-content .some-padding h1{
+    padding:30px 0px;
+    margin:0px;
+}
+
+body .main .main-div .side-content .some-padding .rooms-here{
+    background-color: white;
+    height:40px;
+}
+
+body .main .main-div .side-content .some-padding .rooms-here .sub-room-div{
+    height: 100%;
 }

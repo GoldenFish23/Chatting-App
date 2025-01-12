@@ -4,28 +4,52 @@
     {% if Login == True %}
         <script>
             var socket = io.connect('http://127.0.0.1:5000');
+            const username = "{{ username }}";
             socket.on('connect', () => {
-                console.log('Connected');
-                socket.emit('my event', {data: 'I\'m connected!'});
+                console.log(username + ': ' + 'Connected to the server');
+                // socket.emit('my event', {data: 'I\'m connected!'});
             });
+
+            function joinRoom(roomcode){
+                if( roomcode !== ""){
+                    socket.emit('join_room', {roomcode: roomcode, username: username});
+                    console.log(`joined room : ${roomcode}`);
+                }    
+            }
+
+            function leaveRoom(roomcode) {
+                if( roomcode !== ""){
+                    socket.emit('leave_room', { roomcode: roomcode, username: username });
+                    console.log(`Left room: ${roomcode}`);
+                    window.location.href = "{{ url_for('user_host_room', username=username) }}";
+                }
+            }
+
+            function sendMessage(roomcode){
+                if( roomcode !== ""){
+                    const message = document.getElementById('inputMessage').value;
+                    console.log(`Phase 1 complete`)
+                    if (message.trim() !== ''){
+                        socket.emit('send_message', { roomcode: roomcode, message: message, username: username });
+                        console.log({ roomcode: roomcode, message: message, username: username });
+                        document.getElementById('inputMessage').value = "";
+                    }
+                }
+            }
 
             socket.on('message', (data) => {
-                console.log(data);
+                console.log("Received data from server:", data);
+                const messageDiv = document.createElement('div');
+                messageDiv.textContent = data;
+                console.log(`${data}`);
+                document.getElementById('chatBox').appendChild(messageDiv);
+                console.log(`Phase 2 complete`);
             });
-
-            socket.emit('message', 'Hello from the client!');
 
             socket.on('disconnect', () => {
                 console.log('Disconnected');
             });
 
-            socket.on('join', () => {
-                console.log('Joined the room');
-            });
-
-            socket.on('leave', () => {
-                console.log('Left the room');
-            });
 
         </script>
         <div class = "main-div">
@@ -40,7 +64,7 @@
             <div class = "side-content">
                 <div class = "some-padding">
                     <h1>Welcome to the Chatting App</h1>
-                    {% if selected == 'chats' or selected == None %}
+                    {% if selected == 'chats'%}
                         <div>
                             <p>some chats will arrive here.</p>
                         </div>
@@ -48,23 +72,49 @@
                     {% if selected == 'hostroom' %}
                         <h2>Host Room</h2>
                         <form method = "post">
+                            <input type="hidden" name="button_val" value="hostroom">
                             <label>Room Name:</label>
                             <input type = "text" name = "roomcode" placeholder = "roomname" value="{{roomcode}}">
                             <button type = "submit" name = "but_room" value = "hostroomy">Create Room</button>
                         </form>
-                        {% if roomcode != "" %}
-                            <div class = "rooms-here">
-                                <p>heres a room for you</p>
+                        {% if roomcode != "" and roomcode != None %}
+                            <script>
+                                joinRoom('{{roomcode}}');
+                            </script>
+                            <div class = "chat-section">
+                                <h3>Room: {{ roomcode }}</h3>
+                                <button onclick="leaveRoom('{{roomcode}}')">Leave</button>
+                                <div id="chatBox" style="border: 1px solid #ccc; padding: 10px; height: 200px; overflow-y: scroll;">
+                                    <!-- Messages will appear here -->
+                                </div>
+                                <div class="chat-input">
+                                    <input id="inputMessage" type="text" placeholder="Type a message">
+                                    <button onclick="sendMessage('{{ roomcode }}')">Send</button>
+                                </div>
                             </div>
                         {% endif %}
                     {% endif %}
                     {% if selected == 'joinroom' %}
                         <h2>Join Room</h2>
                         <form method = "post">
+                            <input type="hidden" name="button_val" value="joinroom">
                             <label>Room Name:</label>
                             <input type = "text" name = "roomcode" placeholder = "roomname" value="{{roomcode}}">
                             <button type = "submit" name = "but_room" value = "joinroomy">Join Room</button>
                         </form>
+                        {% if roomcode != "" and roomcode != None %}
+                            <div class = "rooms-here">
+                                <h3>Room: {{ roomcode }}</h3>
+                                <button onclick="leaveRoom('{{roomcode}}')">Leave</button>
+                                <div id="chatBox" style="border: 1px solid #ccc; padding: 10px; height: 200px; overflow-y: scroll;">
+                                    <!-- Messages will appear here -->
+                                </div>
+                                <div class="chat-input">
+                                    <input id="inputMessage" type="text" placeholder="Type a message">
+                                    <button onclick="sendMessage('{{ roomcode }}')">Send</button>
+                                </div>
+                            </div>
+                        {% endif %}
                     {% endif %}
                     {% if selected == 'settings' %}
                         <p>No settings here</p>
